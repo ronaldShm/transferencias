@@ -7,25 +7,20 @@ exports.createTransfer = async (req, res) => {
     const { recipientEmail, amount } = req.body;
 
     try {
-        // Verificar remitente
         const sender = await User.findById(req.userId);
-        console.log('Remitente encontrado:', sender);  // <-- Agrega esto para verificar
         if (!sender) {
             return res.status(404).json({ message: 'Usuario remitente no encontrado' });
         }
 
-        // Verificar si el remitente tiene suficiente saldo
         if (sender.balance < amount) {
             return res.status(400).json({ message: 'Saldo insuficiente' });
         }
 
-        // Verificar receptor
         const recipient = await User.findByEmail(recipientEmail);
         if (!recipient) {
             return res.status(404).json({ message: 'Usuario receptor no encontrado' });
         }
 
-        // Crear la transferencia
         const newTransfer = {
             sender_id: sender.id,
             receiver_id: recipient.id,
@@ -33,14 +28,10 @@ exports.createTransfer = async (req, res) => {
             status: 'pending'
         };
 
-        const result = await Transfer.create(newTransfer);
-        console.log('Transferencia creada:', result);
+        await Transfer.create(newTransfer);
 
-        // Actualizar saldo del remitente
-        const updatedBalance = sender.balance - amount;
-        await User.updateBalance(sender.id, updatedBalance);
-
-        return res.status(201).json({ message: 'Transferencia creada, pendiente de aprobación', newBalance: updatedBalance });
+        // No restar saldo aquí, solo confirmar creación
+        return res.status(201).json({ message: 'Transferencia creada, pendiente de aprobación', currentBalance: sender.balance });
     } catch (err) {
         console.error('Error en la creación de la transferencia:', err);
         return res.status(500).json({ message: 'Error en el servidor al crear la transferencia' });
@@ -56,7 +47,6 @@ exports.approveTransfer = async (req, res) => {
     }
 
     try {
-        // Obtener los detalles de la transferencia
         const transfer = await Transfer.findById(transferId);
         if (!transfer) {
             return res.status(404).json({ message: 'Transferencia no encontrada' });
@@ -65,7 +55,6 @@ exports.approveTransfer = async (req, res) => {
         const { sender_id, receiver_id, amount } = transfer;
 
         if (status === 'approved') {
-            // Obtener los usuarios
             const sender = await User.findById(sender_id);
             const receiver = await User.findById(receiver_id);
 
@@ -73,31 +62,31 @@ exports.approveTransfer = async (req, res) => {
                 return res.status(404).json({ message: 'Remitente o receptor no encontrado' });
             }
 
-            // Actualizar saldos
-            await User.updateBalance(sender.id, sender.balance - amount);
-            await User.updateBalance(receiver.id, receiver.balance + amount);
+            const newSenderBalance = parseFloat(sender.balance) - parseFloat(amount);
+            const newReceiverBalance = parseFloat(receiver.balance) + parseFloat(amount);
 
-            // Actualizar estado de la transferencia
-            await Transfer.updateStatus(transferId, 'approved', reason);
-
-            return res.status(200).json({ message: 'Transferencia aprobada y saldos actualizados' });
-        } else if (status === 'rejected') {
-            // Revertir el saldo al remitente
-            const sender = await User.findById(sender_id);
-            if (!sender) {
-                return res.status(404).json({ message: 'Remitente no encontrado' });
+            if (newSenderBalance < 0) {
+                return res.status(400).json({ message: 'Saldo insuficiente para aprobar la transferencia' });
             }
 
-            await User.updateBalance(sender.id, sender.balance + amount);
+            console.log('Actualizando saldo del remitente:', typeof sender.id, 'Nuevo saldo:', typeof newSenderBalance);
+            await User.updateBalance(sender.id, newSenderBalance);
 
-            // Actualizar estado de la transferencia
-            await Transfer.updateStatus(transferId, 'rejected', reason);
+            console.log('Actualizando saldo del receptor:', typeof receiver.id, 'Nuevo saldo:', typeof newReceiverBalance);
+            await User.updateBalance(receiver.id, newReceiverBalance);
 
-            return res.status(200).json({ message: 'Transferencia rechazada y saldo devuelto' });
+            await Transfer.updateStatus(transferId, status, reason);
+            console.log('Saldo del receptor actualizado correctamente:', newReceiverBalance);
+
+            return res.status(200).json({ message: 'Transferencia aprobada y saldos actualizados' });
+
+        } else if (status === 'rejected') {
+            await Transfer.updateStatus(transferId, status, reason);
+            return res.status(200).json({ message: 'Transferencia rechazada', reason });
         }
     } catch (err) {
-        console.error('Error al procesar la transferencia:', err);
-        return res.status(500).json({ message: 'Error al procesar la transferencia' });
+        console.error('Error al actualizar el estado de la transferencia:', err);
+        return res.status(500).json({ message: 'Error al actualizar el estado de la transferencia' });
     }
 };
 
@@ -111,6 +100,7 @@ exports.getTransfersByUserId = async (req, res) => {
                 transfers.id, 
                 transfers.amount, 
                 transfers.status, 
+                transfers.reason, 
                 receiver.first_name AS receiver_first_name, 
                 receiver.last_name AS receiver_last_name, 
                 receiver.email AS receiver_email

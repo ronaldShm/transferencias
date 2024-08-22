@@ -51,20 +51,23 @@ document.getElementById('transferForm').addEventListener('submit', async (e) => 
             body: JSON.stringify({ recipientEmail, amount })
         });
 
-        if (!res.ok) {
-            const errorMessage = await res.json();
-            throw new Error(errorMessage.message || 'Error al crear la transferencia');
-        }
-
         const data = await res.json();
-
-        alert('Transferencia creada, pendiente de aprobación');
-        document.getElementById('balance').innerText = `Tu saldo es: ${data.newBalance}`;
+        if (res.status === 201) {
+            alert('Transferencia creada, pendiente de aprobación');
+            // Actualizar la vista del balance con el saldo actual
+            document.getElementById('balance').innerText = `Tu saldo es: ${data.currentBalance}`;
+            // Limpiar los campos después de la transferencia exitosa
+            document.getElementById('recipientEmail').value = '';
+            document.getElementById('amount').value = '';
+        } else {
+            alert(data.message);
+        }
     } catch (err) {
         console.error('Error al realizar la transferencia:', err);
-        alert('Error al realizar la transferencia. Por favor, revisa los datos e inténtalo de nuevo.');
     }
 });
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const token = localStorage.getItem('token');
@@ -103,13 +106,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         transfers.forEach(transfer => {
             const listItem = document.createElement('li');
+
+            // Añadir la clase según el estado de la transferencia
+            if (transfer.status === 'approved') {
+                listItem.classList.add('approved');
+            } else if (transfer.status === 'rejected') {
+                listItem.classList.add('rejected');
+            }
+
             listItem.innerHTML = `
                 <strong>ID:</strong> ${transfer.id} 
                 <strong>Receptor:</strong> ${transfer.receiver_first_name} ${transfer.receiver_last_name} 
                 <strong>Email:</strong> ${transfer.receiver_email} 
                 <strong>Status:</strong> ${transfer.status} 
                 <strong>Monto:</strong> ${transfer.amount}
+                <strong>Motivo:</strong> ${transfer.reason ? transfer.reason : 'N/A'}
             `;
+
             transferList.appendChild(listItem);
         });
 

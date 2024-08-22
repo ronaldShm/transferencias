@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetchUsers();
     await fetchPendingTransfers();
     await getAdminData();
+    await fetchAllTransfersAdmin()
 });
 
 // 1. Manejo de Usuarios
@@ -267,15 +268,81 @@ async function fetchAllTransfers() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${transfer.id}</td>
-                <td>${transfer.sender_id}</td>
-                <td>${transfer.receiver_id}</td>
+                <td>${transfer.sender_first_name} ${transfer.sender_last_name}</td>
+                <td>${transfer.receiver_first_name} ${transfer.receiver_last_name}</td>
                 <td>${transfer.amount}</td>
                 <td>${transfer.status}</td>
+                <td>${transfer.reason ? transfer.reason : 'N/A'}</td>
             `;
             tableBody.appendChild(row);
+
+            // Aplicar clases según el estado
+            if (transfer.status === 'approved') {
+                row.classList.add('approved');
+            } else if (transfer.status === 'rejected') {
+                row.classList.add('rejected');
+            }
         });
     } catch (err) {
-        console.error('Error en fetchAllTransfers:', err);
+        console.error('Error al obtener todas las transferencias:', err);
+    }
+}
+
+async function fetchAllTransfersAdmin() {
+    try {
+        console.log('Iniciando fetchAllTransfersAdmin...');
+
+        const token = localStorage.getItem('token');
+        console.log('Token obtenido:', token);
+
+        const res = await fetch('/api/transfers/all', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        console.log('Respuesta obtenida:', res);
+
+        const responseText = await res.text();
+        console.log('Contenido de la respuesta en texto:', responseText);
+
+        if (!responseText) {
+            throw new Error('La respuesta del servidor está vacía.');
+        }
+
+        const transfers = JSON.parse(responseText);
+        console.log('Contenido de la respuesta en JSON:', transfers);
+
+        if (!Array.isArray(transfers)) {
+            throw new Error('La respuesta no es un arreglo de transferencias');
+        }
+
+        const tableBody = document.querySelector('#allTransfersTable tbody');
+        tableBody.innerHTML = '';
+
+        transfers.forEach(transfer => {
+            const row = document.createElement('tr');
+            // Aplicar clases según el estado
+            if (transfer.status === 'approved') {
+                row.style.backgroundColor = '#d4edda';
+                row.style.borderLeft = '5px solid #28a745';
+            } else if (transfer.status === 'rejected') {
+                row.style.backgroundColor = '#f8d7da';
+                row.style.borderLeft = '5px solid #dc3545';
+            }
+            row.innerHTML = `
+                <td>${transfer.id}</td>
+                <td>${transfer.sender_first_name} ${transfer.sender_last_name}</td>
+                <td>${transfer.receiver_first_name} ${transfer.receiver_last_name}</td>
+                <td>${transfer.amount}</td>
+                <td>${transfer.status}</td>
+                <td>${transfer.reason ? transfer.reason : 'N/A'}</td>
+            `;
+            tableBody.appendChild(row);
+
+        });
+    } catch (err) {
+        console.error('Error al obtener todas las transferencias:', err);
     }
 }
 
@@ -304,6 +371,8 @@ async function getAdminData() {
         alert('Error al obtener los datos del administrador: ' + err.message);
     }
 }
+
+
 
 document.getElementById('adminLogoutButton').addEventListener('click', () => {
     localStorage.removeItem('token');

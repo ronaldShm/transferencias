@@ -15,11 +15,26 @@ const Transfer = {
     },
 
     findAll: async () => {
-        const query = 'SELECT * FROM transfers';
         return new Promise((resolve, reject) => {
+            const query = `
+                SELECT 
+                    transfers.id, 
+                    transfers.amount, 
+                    transfers.status, 
+                    transfers.reason,
+                    sender.first_name AS sender_first_name, 
+                    sender.last_name AS sender_last_name, 
+                    receiver.first_name AS receiver_first_name, 
+                    receiver.last_name AS receiver_last_name 
+                FROM 
+                    transfers
+                JOIN 
+                    users AS sender ON transfers.sender_id = sender.id
+                JOIN 
+                    users AS receiver ON transfers.receiver_id = receiver.id
+            `;
             connection.query(query, (err, results) => {
                 if (err) {
-                    console.error('Error al obtener todas las transferencias:', err);
                     return reject(err);
                 }
                 resolve(results);

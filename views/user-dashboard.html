@@ -13,9 +13,8 @@
         <div class="welcome-message" id="welcomeMessage"></div>
         <button id="logoutButton" class="btn logout-btn">Cerrar Sesión</button>
     </div>
-    <div class="user-dashboard-container">
-        <h1>User Dashboard</h1>
 
+    <div class="user-dashboard-container">
         <h2>Mi Balance</h2>
         <p id="balance" class="balance-display"></p>
 
@@ -27,52 +26,14 @@
         </form>
     </div>
 
+    <div class="transfer-list-container">
+        <h2>Mis Transferencias Realizadas</h2>
+        <ul id="transferList">
+            <!-- Aquí se llenarán las transacciones realizadas -->
+        </ul>
+    </div>
+
     <script src="/js/user-dashboard.js"></script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-
-<body>
-    <h1>User Dashboard</h1>
-    <h2>Mi Balance</h2>
-    <p id="balance"></p>
-
-    <h2>Realizar Transferencia</h2>
-    <form id="transferForm">
-        <input type="email" id="recipientEmail" placeholder="Email del receptor" required><br>
-        <input type="number" id="amount" placeholder="Monto a transferir" required><br>
-        <button type="submit">Transferir</button>
-    </form>
-
-    <script src="/js/user-dashboard.js"></script>
-</body>
-
-</html> -->

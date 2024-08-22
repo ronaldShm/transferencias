@@ -103,11 +103,31 @@ exports.approveTransfer = async (req, res) => {
 
 // Obtener transferencias por ID de usuario
 exports.getTransfersByUserId = async (req, res) => {
-    const userId = req.params.id;
+    const userId = req.userId; // Obtén el ID del usuario a partir del token JWT
 
     try {
-        const transfers = await Transfer.getByUserId(userId);
-        return res.status(200).json(transfers);
+        const query = `
+            SELECT 
+                transfers.id, 
+                transfers.amount, 
+                transfers.status, 
+                receiver.first_name AS receiver_first_name, 
+                receiver.last_name AS receiver_last_name, 
+                receiver.email AS receiver_email
+            FROM 
+                transfers
+            JOIN 
+                users AS receiver ON transfers.receiver_id = receiver.id
+            WHERE 
+                transfers.sender_id = ?
+        `;
+        db.query(query, [userId], (err, results) => {
+            if (err) {
+                console.error('Error al obtener transferencias:', err);
+                return res.status(500).json({ message: 'Error al obtener transferencias' });
+            }
+            res.status(200).json(results);
+        });
     } catch (err) {
         console.error('Error al obtener transferencias:', err);
         return res.status(500).json({ message: 'Error al obtener transferencias' });

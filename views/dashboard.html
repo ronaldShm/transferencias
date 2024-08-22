@@ -9,11 +9,11 @@
 </head>
 
 <body>
+    <div class="header">
+        <div class="welcome-message" id="adminWelcomeMessage">Bienvenido, Admin</div>
+        <button id="adminLogoutButton" class="logout-btn">Cerrar Sesión</button>
+    </div>
     <div class="dashboard-container">
-        <div class="admin-header" id="adminHeader">
-            <div class="admin-welcome-message" id="adminWelcomeMessage">Bienvenido, Admin</div>
-            <button id="adminLogoutButton" class="admin-logout-btn">Cerrar Sesión</button>
-        </div>
         <h1>Admin Dashboard</h1>
         <h2>Lista de Usuarios</h2>
         <div class="search-container">
@@ -71,76 +71,7 @@
         <div id="success-message" style="display: none; color: green;"></div>
     </div>
 
-</body>
-<script src="/js/dashboard.js"></script>
-
-</html>
-
-
-
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-
-<body>
-    <h1>Admin Dashboard</h1>
-    <h2>Lista de Usuarios</h2>
-    <input type="text" id="search" placeholder="Buscar usuario por email...">
-    <button onclick="fetchUsers()">Buscar</button>
-    <table id="usersTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Saldo</th>
-                <th>Actualizar Saldo</th>
-            </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-    </table>
-    <h2>Transferencias Pendientes</h2>
-    <button id="fetchPendingTransfersButton">Cargar Transferencias Pendientes</button>
-    <table id="pendingTransfersTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Remitente</th>
-                <th>Receptor</th>
-                <th>Monto</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-           
-        </tbody>
-    </table>
-    <form id="createUserForm">
-        <input type="text" id="first_name" placeholder="Nombre" required>
-        <input type="text" id="last_name" placeholder="Apellido" required>
-        <input type="email" id="email" placeholder="Correo Electrónico" required>
-        <input type="password" id="password" placeholder="Contraseña" required>
-        <select id="role" required>
-            <option value="user">Usuario</option>
-            <option value="admin">Administrador</option>
-        </select>
-        <button type="submit">Crear Usuario</button>
-    </form>
-
     <script src="/js/dashboard.js"></script>
 </body>
 
-</html> -->
+</html>

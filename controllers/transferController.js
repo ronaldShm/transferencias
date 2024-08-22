@@ -62,24 +62,25 @@ exports.approveTransfer = async (req, res) => {
 
         if (status === 'approved') {
             // Obtener los detalles de la transferencia
-            const transfer = await Transfer.findById(transferId);
-            if (!transfer || transfer.length === 0) {
+            const transferResult = await Transfer.findById(transferId);
+            if (!transferResult || transferResult.length === 0) {
                 return res.status(404).json({ message: 'Transferencia no encontrada' });
             }
 
-            const { sender_id, receiver_id, amount } = transfer[0];
+            const { sender_id, receiver_id, amount } = transferResult[0];
 
-            // Actualizar saldo del remitente
+            // Obtener los detalles del remitente y receptor
             const senderResult = await User.findById(sender_id);
             const receiverResult = await User.findById(receiver_id);
 
-            if (!senderResult || !receiverResult || senderResult.length === 0 || receiverResult.length === 0) {
+            if (!senderResult || senderResult.length === 0 || !receiverResult || receiverResult.length === 0) {
                 return res.status(404).json({ message: 'Remitente o receptor no encontrado' });
             }
 
             const sender = senderResult[0];
             const receiver = receiverResult[0];
 
+            // Actualizar los saldos del remitente y del receptor
             await User.updateBalance(sender.id, sender.balance - amount);
             await User.updateBalance(receiver.id, receiver.balance + amount);
 
@@ -98,8 +99,8 @@ exports.getTransfersByUserId = async (req, res) => {
     const userId = req.params.id;
 
     try {
-        const result = await Transfer.getByUserId(userId);
-        return res.status(200).json(result);
+        const transfers = await Transfer.getByUserId(userId);
+        return res.status(200).json(transfers);
     } catch (err) {
         console.error('Error al obtener transferencias:', err);
         return res.status(500).json({ message: 'Error al obtener transferencias' });
@@ -107,33 +108,31 @@ exports.getTransfersByUserId = async (req, res) => {
 };
 
 // Obtener todas las transferencias pendientes
-exports.getPendingTransfers = (req, res) => {
-    Transfer.findByStatus('pending', (err, transfers) => {
-        if (err) {
-            console.error('Error al obtener transferencias pendientes:', err);
-            return res.status(500).json({ message: 'Error al obtener transferencias pendientes' });
-        }
-
+exports.getPendingTransfers = async (req, res) => {
+    try {
+        const transfers = await Transfer.findByStatus('pending');
         if (!transfers || transfers.length === 0) {
             return res.status(200).json([]);  // Devuelve un array vacío si no hay transferencias pendientes
         }
 
-        res.status(200).json(transfers);  // Devuelve las transferencias pendientes en formato JSON
-    });
+        return res.status(200).json(transfers);  // Devuelve las transferencias pendientes en formato JSON
+    } catch (err) {
+        console.error('Error al obtener transferencias pendientes:', err);
+        return res.status(500).json({ message: 'Error al obtener transferencias pendientes' });
+    }
 };
 
 // Obtener todas las transferencias
-exports.getAllTransfers = (req, res) => {
-    Transfer.findAll((err, transfers) => {
-        if (err) {
-            console.error('Error al obtener transferencias:', err);
-            return res.status(500).json({ message: 'Error al obtener transferencias' });
-        }
-
+exports.getAllTransfers = async (req, res) => {
+    try {
+        const transfers = await Transfer.findAll();
         if (!transfers || transfers.length === 0) {
             return res.status(200).json([]);  // Devuelve un array vacío si no hay transferencias
         }
 
-        res.status(200).json(transfers);  // Devuelve las transferencias en formato JSON
-    });
+        return res.status(200).json(transfers);  // Devuelve las transferencias en formato JSON
+    } catch (err) {
+        console.error('Error al obtener transferencias:', err);
+        return res.status(500).json({ message: 'Error al obtener transferencias' });
+    }
 };

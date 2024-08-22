@@ -1,8 +1,9 @@
 // Inicialización al cargar el DOM
-document.addEventListener('DOMContentLoaded', () => {
-    fetchAllTransfers();
-    fetchUsers();
-    fetchPendingTransfers();
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchAllTransfers();
+    await fetchUsers();
+    await fetchPendingTransfers();
+    await getAdminData();
 });
 
 // 1. Manejo de Usuarios
@@ -52,11 +53,7 @@ async function fetchUsers() {
         });
     } catch (err) {
         console.error('Error al obtener usuarios:', err);
-        if (err.message.includes('La respuesta no es un arreglo de usuarios')) {
-            alert('Error: La respuesta del servidor no es válida. Por favor, contacta al soporte.');
-        } else {
-            alert('Error al obtener usuarios. Por favor, intenta nuevamente más tarde.');
-        }
+        alert('Error al obtener usuarios. Por favor, intenta nuevamente más tarde.');
     }
 }
 
@@ -177,8 +174,6 @@ async function fetchPendingTransfers() {
 }
 
 async function approveTransfer(transferId) {
-    const reason = ''; // O puedes pedir un motivo antes de aprobar
-
     try {
         const token = localStorage.getItem('token');
         const res = await fetch('/api/transfers/approve', {
@@ -187,7 +182,7 @@ async function approveTransfer(transferId) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ transferId, status: 'approved', reason })
+            body: JSON.stringify({ transferId, status: 'approved' })
         });
 
         const data = await res.json();
@@ -233,37 +228,8 @@ async function rejectTransfer(transferId) {
     }
 }
 
-
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('/api/users/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!res.ok) {
-            const errorMessage = await res.text();
-            throw new Error(`Error al obtener los datos del administrador: ${errorMessage}`);
-        }
-
-        const userData = await res.json();
-        console.log('Datos del administrador:', userData);
-
-        // Mostrar los datos del administrador en la interfaz
-    } catch (err) {
-        console.error('Error al obtener los datos del administrador:', err);
-        alert('Error al obtener los datos del administrador: ' + err.message);
-    }
-});
-
-document.getElementById('adminLogoutButton').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    window.location.href = '/';
-});
-
-
+// 3. Manejo de Transferencias Generales
+// ----------------------------------------------------
 async function fetchAllTransfers() {
     try {
         console.log('Iniciando fetchAllTransfers...');
@@ -279,16 +245,13 @@ async function fetchAllTransfers() {
 
         console.log('Respuesta obtenida:', res);
 
-        // Capturar el texto de la respuesta antes de intentar parsearlo
         const responseText = await res.text();
         console.log('Contenido de la respuesta en texto:', responseText);
 
-        // Si la respuesta es vacía o no es un JSON válido, mostrar un mensaje de error
         if (!responseText) {
             throw new Error('La respuesta del servidor está vacía.');
         }
 
-        // Intentar parsear la respuesta como JSON
         const transfers = JSON.parse(responseText);
         console.log('Contenido de la respuesta en JSON:', transfers);
 
@@ -314,3 +277,34 @@ async function fetchAllTransfers() {
         console.error('Error en fetchAllTransfers:', err);
     }
 }
+
+// 4. Manejo de Sesión de Administrador
+// ----------------------------------------------------
+async function getAdminData() {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/users/me', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) {
+            const errorMessage = await res.text();
+            throw new Error(`Error al obtener los datos del administrador: ${errorMessage}`);
+        }
+
+        const userData = await res.json();
+        console.log('Datos del administrador:', userData);
+
+        // Mostrar los datos del administrador en la interfaz
+    } catch (err) {
+        console.error('Error al obtener los datos del administrador:', err);
+        alert('Error al obtener los datos del administrador: ' + err.message);
+    }
+}
+
+document.getElementById('adminLogoutButton').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+});

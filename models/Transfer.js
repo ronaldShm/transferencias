@@ -1,63 +1,98 @@
 const connection = require('../config/config');
 
 const Transfer = {
-    create: (data, callback) => {
+    create: async (data) => {
         const query = `INSERT INTO transfers (sender_id, receiver_id, amount, status) VALUES (?, ?, ?, ?)`;
-        connection.query(query, [data.sender_id, data.receiver_id, data.amount, data.status], callback);
+        return new Promise((resolve, reject) => {
+            connection.query(query, [data.sender_id, data.receiver_id, data.amount, data.status], (err, results) => {
+                if (err) {
+                    console.error('Error al crear la transferencia:', err);
+                    return reject(err);
+                }
+                resolve(results);
+            });
+        });
     },
 
-    findAll: (callback) => {
+    findAll: async () => {
         const query = 'SELECT * FROM transfers';
-        connection.query(query, (err, results) => {
-            if (err) {
-                console.error('Error al ejecutar la consulta:', err);
-                return callback(err, null);
-            }
-            callback(null, results);
+        return new Promise((resolve, reject) => {
+            connection.query(query, (err, results) => {
+                if (err) {
+                    console.error('Error al obtener todas las transferencias:', err);
+                    return reject(err);
+                }
+                resolve(results);
+            });
         });
     },
-    getByUserId: (userId, callback) => {
+
+    getByUserId: async (userId) => {
         const query = `SELECT * FROM transfers WHERE sender_id = ? OR receiver_id = ?`;
-        connection.query(query, [userId, userId], callback);
+        return new Promise((resolve, reject) => {
+            connection.query(query, [userId, userId], (err, results) => {
+                if (err) {
+                    console.error('Error al obtener transferencias por usuario:', err);
+                    return reject(err);
+                }
+                resolve(results);
+            });
+        });
     },
 
-    updateStatus: (id, status, reason, callback) => {
+    updateStatus: async (id, status, reason) => {
         const query = `UPDATE transfers SET status = ?, reason = ? WHERE id = ?`;
-        connection.query(query, [status, reason, id], callback);
+        return new Promise((resolve, reject) => {
+            connection.query(query, [status, reason, id], (err, results) => {
+                if (err) {
+                    console.error('Error al actualizar el estado de la transferencia:', err);
+                    return reject(err);
+                }
+                resolve(results);
+            });
+        });
     },
 
-    getPending: (callback) => {
+    getPending: async () => {
         const query = `SELECT * FROM transfers WHERE status = 'pending'`;
-        connection.query(query, (err, results) => {
-            if (err) {
-                console.error('Error en la consulta de transferencias pendientes:', err);
-                return callback(err, null);
-            }
-            console.log('Resultados de getPending:', results);  // Verifica si los resultados se están recuperando
-            callback(null, results);
+        return new Promise((resolve, reject) => {
+            connection.query(query, (err, results) => {
+                if (err) {
+                    console.error('Error al obtener transferencias pendientes:', err);
+                    return reject(err);
+                }
+                console.log('Resultados de getPending:', results);  // Verifica si los resultados se están recuperando
+                resolve(results);
+            });
         });
     },
 
-    findById: (id, callback) => {
-        const query = 'SELECT * FROM users WHERE id = ?';
-        db.query(query, [id], (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            if (results.length === 0) {
-                return callback(null, null); // No se encontró el usuario
-            }
-            callback(null, results[0]); // Devuelve el primer resultado si se encuentra
+    findById: async (id) => {
+        const query = 'SELECT * FROM transfers WHERE id = ?';
+        return new Promise((resolve, reject) => {
+            connection.query(query, [id], (err, results) => {
+                if (err) {
+                    console.error('Error al obtener la transferencia por ID:', err);
+                    return reject(err);
+                }
+                if (results.length === 0) {
+                    return resolve(null); // No se encontró la transferencia
+                }
+                resolve(results[0]); // Devuelve el primer resultado si se encuentra
+            });
         });
     },
 
-    findByStatus: (status, callback) => {
+    findByStatus: async (status) => {
         const query = 'SELECT * FROM transfers WHERE status = ?';
-        db.query(query, [status], (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            callback(null, results);
+        return new Promise((resolve, reject) => {
+            connection.query(query, [status], (err, results) => {
+                if (err) {
+                    console.error('Error al obtener transferencias por estado:', err);
+                    return reject(err);
+                }
+                resolve(results);
+            });
         });
     },
 };

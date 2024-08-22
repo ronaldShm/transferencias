@@ -1,38 +1,37 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 // Obtener todos los usuarios (usado en el panel de administrador)
-exports.getAllUsers = (req, res) => {
-    User.getAll((err, result) => {
-        if (err) {
-            console.error('Error al obtener usuarios:', err);
-            return res.status(500).json({ message: 'Error al obtener usuarios' });
-        }
-        res.status(200).json(result);
-    });
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.getAll();
+        return res.status(200).json(users);
+    } catch (err) {
+        console.error('Error al obtener usuarios:', err);
+        return res.status(500).json({ message: 'Error al obtener usuarios' });
+    }
 };
 
 // Obtener información del usuario autenticado (incluyendo el balance)
-exports.getMe = (req, res) => {
-    User.findById(req.userId, (err, user) => {
-        if (err) {
-            console.error('Error al obtener el usuario:', err);
-            return res.status(500).json({ message: 'Error al obtener el usuario' });
-        }
+exports.getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
         res.status(200).json(user);
-    });
+    } catch (err) {
+        console.error('Error al obtener el usuario:', err);
+        res.status(500).json({ message: 'Error al obtener el usuario' });
+    }
 };
+
 // Actualizar el balance de un usuario
-exports.updateUserBalance = (req, res) => {
+exports.updateUserBalance = async (req, res) => {
     const { id, balance } = req.body;
 
-    User.findById(id, (err, user) => {
-        if (err) {
-            console.error('Error al buscar el usuario:', err);
-            return res.status(500).json({ message: 'Error en el servidor al buscar el usuario' });
-        }
+    try {
+        const user = await User.findById(id);
         if (!user) {
             console.error(`Usuario con ID ${id} no encontrado`);
             return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -48,31 +47,29 @@ exports.updateUserBalance = (req, res) => {
 
         console.log('Nuevo saldo:', newBalance);
 
-        User.updateBalance(id, newBalance, (err, result) => {
-            if (err) {
-                console.error('Error al actualizar el saldo:', err);
-                return res.status(500).json({ message: 'Error en el servidor al actualizar el saldo' });
-            }
-
-            res.status(200).json({ message: 'Saldo actualizado con éxito', newBalance });
-        });
-    });
+        await User.updateBalance(id, newBalance);
+        return res.status(200).json({ message: 'Saldo actualizado con éxito', newBalance });
+    } catch (err) {
+        console.error('Error al actualizar el saldo:', err);
+        return res.status(500).json({ message: 'Error en el servidor al actualizar el saldo' });
+    }
 };
+
 // Actualizar el rol de un usuario
-exports.updateUserRole = (req, res) => {
+exports.updateUserRole = async (req, res) => {
     const { id, role } = req.body;
 
-    User.updateRole(id, role, (err) => {
-        if (err) {
-            console.error('Error al actualizar el rol del usuario:', err);
-            return res.status(500).json({ message: 'Error al actualizar el rol del usuario' });
-        }
-        res.status(200).json({ message: 'Rol actualizado con éxito' });
-    });
+    try {
+        await User.updateRole(id, role);
+        return res.status(200).json({ message: 'Rol actualizado con éxito' });
+    } catch (err) {
+        console.error('Error al actualizar el rol del usuario:', err);
+        return res.status(500).json({ message: 'Error al actualizar el rol del usuario' });
+    }
 };
 
 // Crear un nuevo usuario
-exports.createUser = (req, res) => {
+exports.createUser = async (req, res) => {
     const { first_name, last_name, email, password, role } = req.body;
 
     if (!first_name || !last_name || !email || !password || !role) {
@@ -80,70 +77,46 @@ exports.createUser = (req, res) => {
         return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
-    User.findByEmail(email, (err, existingUser) => {
-        if (err) {
-            console.error('Error al buscar el usuario:', err);
-            return res.status(500).json({ message: 'Error al buscar el usuario' });
-        }
+    try {
+        // Verificar si el usuario ya existe
+        const existingUser = await User.findByEmail(email);
         if (existingUser) {
             console.error('Error: El correo electrónico ya está en uso');
             return res.status(400).json({ message: 'El correo electrónico ya está en uso' });
         }
 
-        const newUser = { first_name, last_name, email, password, role, balance: 0 };
+        // Encriptar la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        User.create(newUser, (err, user) => {
-            if (err) {
-                console.error('Error al crear el usuario:', err);
-                return res.status(500).json({ message: 'Error al crear el usuario' });
-            }
+        const newUser = {
+            first_name,
+            last_name,
+            email,
+            password: hashedPassword, // Guardar la contraseña encriptada
+            role,
+            balance: 0
+        };
 
-            console.log('Usuario creado con éxito:', user);
-            res.status(201).json({ message: 'Usuario creado con éxito', user });
-        });
-    });
+        const user = await User.create(newUser);
+        console.log('Usuario creado con éxito:', user);
+        res.status(201).json({ message: 'Usuario creado con éxito', user });
+    } catch (err) {
+        console.error('Error al crear el usuario:', err);
+        res.status(500).json({ message: 'Error al crear el usuario' });
+    }
 };
 
 // Obtener el balance del usuario autenticado
-exports.getUserBalance = (req, res) => {
-    User.findById(req.userId, (err, result) => {
-        if (err) return res.status(500).json({ message: 'Error al obtener el usuario' });
-        if (!result || result.length === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
-
-        const user = result[0];
-        res.status(200).json({ balance: user.balance });
-    });
-};
-
-exports.updateUserBalance = (req, res) => {
-    const { id, balance } = req.body;
-
-    User.findById(id, (err, user) => {
-        if (err) {
-            console.error('Error al buscar el usuario:', err);
-            return res.status(500).json({ message: 'Error en el servidor al buscar el usuario' });
-        }
-        if (!user) {
+exports.getUserBalance = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user || user.length === 0) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        const currentBalance = parseFloat(user.balance) || 0;
-        const additionalBalance = parseFloat(balance) || 0;
-
-        console.log('Saldo actual:', currentBalance);
-        console.log('Saldo a agregar:', additionalBalance);
-
-        const newBalance = currentBalance + additionalBalance;
-
-        console.log('Nuevo saldo:', newBalance);
-
-        User.updateBalance(id, newBalance, (err, result) => {
-            if (err) {
-                console.error('Error al actualizar el saldo:', err);
-                return res.status(500).json({ message: 'Error en el servidor al actualizar el saldo' });
-            }
-
-            res.status(200).json({ message: 'Saldo actualizado con éxito', newBalance });
-        });
-    });
+        return res.status(200).json({ balance: user.balance });
+    } catch (err) {
+        console.error('Error al obtener el balance del usuario:', err);
+        return res.status(500).json({ message: 'Error al obtener el balance del usuario' });
+    }
 };

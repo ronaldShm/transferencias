@@ -1,3 +1,4 @@
+// Inicialización al cargar el DOM
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const token = localStorage.getItem('token');
@@ -22,14 +23,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('balance').textContent = `Tu saldo es: ${data.balance}`;
     } catch (err) {
         console.error('Error al obtener los datos del usuario:', err);
+        alert('Error al obtener los datos del usuario. Por favor, inténtalo de nuevo más tarde.');
     }
 });
 
+// Manejador del botón de cierre de sesión
 document.getElementById('logoutButton').addEventListener('click', () => {
     localStorage.removeItem('token');
     window.location.href = '/';
 });
 
+// Manejador del formulario de transferencia
 document.getElementById('transferForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -47,22 +51,17 @@ document.getElementById('transferForm').addEventListener('submit', async (e) => 
             body: JSON.stringify({ recipientEmail, amount })
         });
 
-        const data = await res.json();
-        if (res.status === 201) {
-            alert('Transferencia creada, pendiente de aprobación');
-            document.getElementById('balance').innerText = `Tu saldo es: ${data.newBalance}`;
-        } else {
-            alert(data.message);
+        if (!res.ok) {
+            const errorMessage = await res.json();
+            throw new Error(errorMessage.message || 'Error al crear la transferencia');
         }
+
+        const data = await res.json();
+
+        alert('Transferencia creada, pendiente de aprobación');
+        document.getElementById('balance').innerText = `Tu saldo es: ${data.newBalance}`;
     } catch (err) {
         console.error('Error al realizar la transferencia:', err);
+        alert('Error al realizar la transferencia. Por favor, revisa los datos e inténtalo de nuevo.');
     }
 });
-
-// document.getElementById('logoutButton').addEventListener('click', () => {
-//     // Eliminar el token del almacenamiento local
-//     localStorage.removeItem('token');
-
-//     // Redirigir a la página de inicio de sesión
-//     window.location.href = '/';
-// });

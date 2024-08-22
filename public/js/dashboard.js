@@ -158,8 +158,8 @@ async function fetchPendingTransfers() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${transfer.id}</td>
-                <td>${transfer.sender_id}</td>
-                <td>${transfer.receiver_id}</td>
+                <td>${transfer.sender_id} - ${transfer.sender_first_name} ${transfer.sender_last_name}</td>
+                <td>${transfer.receiver_id} - ${transfer.receiver_first_name} ${transfer.receiver_last_name}</td>
                 <td>${transfer.amount}</td>
                 <td>
                     <button onclick="approveTransfer(${transfer.id})">Aprobar</button>

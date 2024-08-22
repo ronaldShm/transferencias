@@ -1,3 +1,4 @@
+const db = require('../config/config');
 const Transfer = require('../models/Transfer');
 const User = require('../models/User');
 
@@ -114,18 +115,35 @@ exports.getTransfersByUserId = async (req, res) => {
 };
 
 // Obtener todas las transferencias pendientes
-exports.getPendingTransfers = async (req, res) => {
-    try {
-        const transfers = await Transfer.findByStatus('pending');
-        if (!transfers || transfers.length === 0) {
-            return res.status(200).json([]);  // Devuelve un array vacío si no hay transferencias pendientes
-        }
+exports.getPendingTransfers = (req, res) => {
+    const query = `
+        SELECT 
+            transfers.id, 
+            transfers.amount, 
+            transfers.status, 
+            transfers.sender_id, 
+            transfers.receiver_id, 
+            sender.first_name AS sender_first_name, 
+            sender.last_name AS sender_last_name, 
+            receiver.first_name AS receiver_first_name, 
+            receiver.last_name AS receiver_last_name
+        FROM 
+            transfers
+        JOIN 
+            users AS sender ON transfers.sender_id = sender.id
+        JOIN 
+            users AS receiver ON transfers.receiver_id = receiver.id
+        WHERE 
+            transfers.status = 'pending'
+    `;
 
-        return res.status(200).json(transfers);  // Devuelve las transferencias pendientes en formato JSON
-    } catch (err) {
-        console.error('Error al obtener transferencias pendientes:', err);
-        return res.status(500).json({ message: 'Error al obtener transferencias pendientes' });
-    }
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error en la consulta de transferencias pendientes:', err);
+            return res.status(500).json({ message: 'Error al obtener transferencias pendientes' });
+        }
+        res.status(200).json(results);
+    });
 };
 
 // Obtener todas las transferencias

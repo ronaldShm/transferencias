@@ -1,0 +1,482 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Contenedor principal */
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Título */
+.login-container h1 {
+    margin-bottom: 24px;
+    font-size: 24px;
+    color: #333333;
+}
+
+/* Inputs */
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #007BFF;
+    outline: none;
+    background-color: #ffffff;
+}
+
+/* Botón de envío */
+.login-container button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Links */
+.login-container a {
+    display: block;
+    margin-top: 16px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.login-container a:hover {
+    text-decoration: underline;
+}
+
+/* Mensajes de error */
+.login-container .error-message {
+    color: #ff4d4d;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* Mensajes de éxito */
+.login-container .success-message {
+    color: #28a745;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* Contenedor principal del dashboard */
+.dashboard-container {
+    margin-top: 200px !important;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Título del dashboard */
+.dashboard-container h1 {
+    font-size: 28px;
+    color: #333333;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* Estilo de la tabla */
+.dashboard-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.dashboard-container table th,
+.dashboard-container table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+.dashboard-container table th {
+    background-color: #007BFF;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.dashboard-container table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Botones en el dashboard */
+.dashboard-container .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #007BFF;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-container .btn:hover {
+    background-color: #0056b3;
+}
+
+.dashboard-container .btn.approve {
+    background-color: #28a745;
+}
+
+.dashboard-container .btn.approve:hover {
+    background-color: #218838;
+}
+
+.dashboard-container .btn.reject {
+    background-color: #dc3545;
+}
+
+.dashboard-container .btn.reject:hover {
+    background-color: #c82333;
+}
+
+/* Barra lateral (si tienes una) */
+.sidebar {
+    background-color: #333333;
+    padding: 20px;
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: #ffffff;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 15px;
+    color: #ffffff;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: #007BFF;
+}
+
+.sidebar a.active {
+    background-color: #0056b3;
+}
+
+/* Contenido principal (ajustado si tienes barra lateral) */
+.main-content {
+    margin-left: 270px;
+    /* Ajusta según el ancho de la sidebar */
+    padding: 20px;
+}
+
+/* Mensajes de error y éxito */
+.dashboard-container .error-message {
+    color: #ff4d4d;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.dashboard-container .success-message {
+    color: #28a745;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* Contenedor principal del dashboard */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Título del dashboard */
+.dashboard-container h1,
+.dashboard-container h2 {
+    color: #333333;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* Contenedor de búsqueda */
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-container input[type="text"] {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.search-container .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #007BFF;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.search-container .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo de la tabla */
+.dashboard-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.dashboard-container table th,
+.dashboard-container table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+.dashboard-container table th {
+    background-color: #007BFF;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.dashboard-container table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilos para botones en el dashboard */
+.dashboard-container .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #007BFF;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-container .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Formulario de creación de usuario */
+#createUserForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#createUserForm input,
+#createUserForm select {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#createUserForm button {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #007BFF;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#createUserForm button:hover {
+    background-color: #0056b3;
+}
+
+/* Contenedor principal del User Dashboard */
+.user-dashboard-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Títulos */
+.user-dashboard-container h1,
+.user-dashboard-container h2 {
+    color: #333333;
+    margin-bottom: 24px;
+}
+
+/* Display del balance */
+.balance-display {
+    font-size: 24px;
+    color: #007BFF;
+    margin-bottom: 20px;
+}
+
+/* Formulario de transferencia */
+.transfer-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.transfer-form input {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.transfer-form button {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #007BFF;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.transfer-form button:hover {
+    background-color: #0056b3;
+}
+
+.error-message {
+    color: red;
+    margin: 10px 0;
+    text-align: center;
+    display: none;
+    /* Inicialmente oculto */
+}
+
+.header {
+    position: absolute;
+    top: 10px;
+    /* Ajusta según la distancia que desees desde la parte superior */
+    right: 20px;
+    /* Ajusta según la distancia que desees desde la parte derecha */
+    display: flex;
+    align-items: center;
+    background-color: #007BFF;
+    /* Color de fondo para la barra superior */
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.welcome-message {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 20px;
+    /* Espacio entre el mensaje de bienvenida y el botón de cerrar sesión */
+}
+
+.logout-btn {
+    background-color: #dc3545;
+    border: none;
+    padding: 10px 15px;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+}
+
+.admin-header {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background-color: #007BFF;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.admin-welcome-message {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.admin-logout-btn {
+    background-color: #dc3545;
+    border: none;
+    padding: 10px 15px;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.admin-logout-btn:hover {
+    background-color: #c82333;
+}

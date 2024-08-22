@@ -34,37 +34,37 @@ document.getElementById('logoutButton').addEventListener('click', () => {
 });
 
 // Manejador del formulario de transferencia
-// document.getElementById('transferForm').addEventListener('submit', async (e) => {
-//     e.preventDefault();
+document.getElementById('transferForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-//     const recipientEmail = document.getElementById('recipientEmail').value;
-//     const amount = document.getElementById('amount').value;
+    const recipientEmail = document.getElementById('recipientEmail').value;
+    const amount = document.getElementById('amount').value;
 
-//     try {
-//         const token = localStorage.getItem('token');
-//         const res = await fetch('/api/transfers/create', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${token}`
-//             },
-//             body: JSON.stringify({ recipientEmail, amount })
-//         });
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/transfers/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ recipientEmail, amount })
+        });
 
-//         if (!res.ok) {
-//             const errorMessage = await res.json();
-//             throw new Error(errorMessage.message || 'Error al crear la transferencia');
-//         }
+        if (!res.ok) {
+            const errorMessage = await res.json();
+            throw new Error(errorMessage.message || 'Error al crear la transferencia');
+        }
 
-//         const data = await res.json();
+        const data = await res.json();
 
-//         alert('Transferencia creada, pendiente de aprobación');
-//         document.getElementById('balance').innerText = `Tu saldo es: ${data.newBalance}`;
-//     } catch (err) {
-//         console.error('Error al realizar la transferencia:', err);
-//         alert('Error al realizar la transferencia. Por favor, revisa los datos e inténtalo de nuevo.');
-//     }
-// });
+        alert('Transferencia creada, pendiente de aprobación');
+        document.getElementById('balance').innerText = `Tu saldo es: ${data.newBalance}`;
+    } catch (err) {
+        console.error('Error al realizar la transferencia:', err);
+        alert('Error al realizar la transferencia. Por favor, revisa los datos e inténtalo de nuevo.');
+    }
+});
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const token = localStorage.getItem('token');

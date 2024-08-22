@@ -1,3 +1,4 @@
+
 // Inicialización al cargar el DOM
 document.addEventListener('DOMContentLoaded', async () => {
     await fetchAllTransfers();
